@@ -657,6 +657,15 @@ function windowCreateFinish(json) {
             url: url
         })
     })
+    elements[json.targetID].webContents.on('render-process-gone', (event, details) => {
+        if (details.reason !== 'clean-exit') {
+            console.error('Renderer process crashed. Reloading the window...');
+            // Using a small delay before reloading can help prevent potential race conditions
+            setTimeout(() => {
+                elements[json.targetID].reload();
+            }, 500);
+        }
+    })
     if (typeof json.windowOptions.appDetails !== "undefined" && process.platform === "win32"){
         elements[json.targetID].setThumbarButtons([]);
         elements[json.targetID].setAppDetails(json.windowOptions.appDetails);
